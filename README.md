@@ -28,4 +28,36 @@ Sentinel enables:
 Policies are verified with the Sentinel Simulator tool, which can be downloaded here : https://docs.hashicorp.com/sentinel/downloads
 
 
+## Walk-through
 
+Check : 
+```go
+hour = 4
+main = rule { hour >= 0 and hour < 12 }
+```
+
+This first line of this example declares a variable named hour with the value 4. The second line declares a rule that will return true if hour is between 0 and 12.
+
+This policy can be applied using Sentinel Simulator to determine whether this policy passed or failed. Save this file as [policy.sentinel](policy.sentinel) and run the Sentinel Simulator against it : 
+```bash
+sentinel apply policy.sentinel
+Pass
+```
+This example introduces a core concept of Sentinel; Rules. Rules are the primary definitions within a policy. Rules are boolean operators that evaluate whether a statement is true or false. The result of a rule can be used to determine whether or not a Terraform action can execute. We'll look more at rules and how they function.
+
+### Rules
+
+All policies need a main rule. This is the rule that that defines the final output of Pass or Fail in Sentinel. Let's take a look at more complex rule:
+
+```go
+import "tfplan"
+
+main = rule {
+  all tfplan.resources.aws_instance as _, instances {
+    all instances as _, r {
+      r.applied.tags else null is not null
+      }
+  }
+}
+```
+??? what is this ?? `r.applied.tags else null is not null`  - makes no sense for me so far
